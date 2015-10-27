@@ -242,9 +242,10 @@ public:
 	string Resolve()
 	{
         mAnswer = "Answer <= ";
+        vector<bool> accessed(mKB.size(), false);
 		for (const string &goal : mQuery)
 		{
-            mAnswer += Resolve(goal, "ROOT");
+            mAnswer += Resolve(goal, "ROOT", accessed);
 		}
 
 		return mAnswer;
@@ -267,7 +268,7 @@ private:
 
 	// Resolve
 	// Resolve goal
-	string Resolve(string node, string parent)
+	string Resolve(string node, string parent, vector<bool> accessed)
 	{
 		TRACE(node)
 		// If node is empty
@@ -311,12 +312,17 @@ private:
 		{
             tempnode = ""; // reset new path
             // Choose nondeterministically a section from KB
-			vector<string> &body = Choose(memory);
+            bool deepFlag = false;
+			vector<string> &body = Choose(memory, accessed, deepFlag);
+
+            // Stop loop
+            if (deepFlag)
+                return node;
+            
 			for (const string &str : body)
 			{
                 DEBUG("RESOLVE(" + str + " " + node + ")")
-				tempnode += Resolve(str, node);
-
+				tempnode += Resolve(str, node, accessed);
 			}
 
 			if (tempnode == "")
@@ -334,7 +340,7 @@ private:
 	}
 
 	//Choose : non-determinism on a deterministic machine
-	vector<string>& Choose(vector<int> &memory)
+	vector<string>& Choose(vector<int> &memory, vector<bool> &accessed, bool &dFlag)
 	{	
 		unsigned seed = chrono::system_clock::now().time_since_epoch().count();
   		default_random_engine engine(seed);
@@ -348,6 +354,13 @@ private:
 		int i = memory[offset];
 		memory.erase(memory.begin()+offset);
 
+        // check for loop
+        if (accessed[i] == true)
+        {
+            dFlag = true;
+        }
+
+        accessed[i] = true;
 		return mKB[i].second;
 
 	}
@@ -378,10 +391,6 @@ private:
 ///////////////////////////////////////////////////////////////////////////
 int main(int argc, char* argv[])
 {
-
-	// Vars
-
-
 	if (argc < 2)
 	{
 		cout << "Need to provide file name (ie test1.txt) as argument" << endl;
@@ -392,8 +401,7 @@ int main(int argc, char* argv[])
 	{
 		if (*argv[2] == '2')
 		{
-			g_dDebug
-		 = true;
+			g_dDebug = true;
 		}
 		else if (*argv[2] == '1')
 		{
