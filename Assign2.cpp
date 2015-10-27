@@ -314,13 +314,14 @@ private:
 			vector<string> &body = Choose(memory);
 			for (const string &str : body)
 			{
+                DEBUG("RESOLVE(" + str + " " + node + ")")
 				tempnode += Resolve(str, node);
 
 			}
 
 			if (tempnode == "")
 			{
-				// DEBUG("ActualPath: " + node)
+				 DEBUG("ActualPath: " + node)
 				mSolutionTree.AddNode(parent, node);
 				return tempnode;
 			}
