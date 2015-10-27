@@ -1,0 +1,6 @@
+BACKWARD CHAINING REASONER
+FILE: test2_out.txt
+Answer <=  a
+Answer <=  d
+Answer <= e
+NO SOLUTION FOUND!

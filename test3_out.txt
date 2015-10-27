@@ -1,0 +1,10 @@
+BACKWARD CHAINING REASONER
+FILE: test3_out.txt
+Answer <=  a
+Answer <=  b d
+Answer <=  b d1
+Answer <=  b
+Answer <=  j
+Answer <=  e
+Answer <= 
+QUERY IS A CONSEQUENCE OF THE KB!
