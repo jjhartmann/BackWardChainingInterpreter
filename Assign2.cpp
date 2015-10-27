@@ -317,8 +317,10 @@ private:
 
             // Stop loop
             if (deepFlag)
+            {
                 return node;
-            
+            }
+
 			for (const string &str : body)
 			{
                 DEBUG("RESOLVE(" + str + " " + node + ")")
@@ -355,9 +357,10 @@ private:
 		memory.erase(memory.begin()+offset);
 
         // check for loop
-        if (accessed[i] == true)
-        {
-            dFlag = true;
+        for (const int &w : memory) {
+            if (accessed[w] == true) {
+                dFlag = true;
+            }
         }
 
         accessed[i] = true;
