@@ -1,6 +1,18 @@
 BACKWARD CHAINING REASONER
 FILE: test5_out.txt
 Answer <=  a z
+Answer <=  a a d x
+Answer <=  a a d er te
+Answer <=  a a d er
+Answer <=  a a d rr
+Answer <=  a a d
+Answer <=  a a d1
+Answer <=  a a
+Answer <=  a b d
+Answer <=  a b d1
+Answer <=  a b
+Answer <=  a j
+Answer <=  a e
 Answer <=  a
 Answer <=  b d
 Answer <=  b d1
