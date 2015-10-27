@@ -67,7 +67,7 @@ public:
 		}
 
 		Empty(it->second);
-		TRACE("ERASE: " + it->first)
+		TRACE("ERASE: <" + it->first + " " + it->second + ">")
 		tree.erase(it);
 	}
 
@@ -84,6 +84,26 @@ public:
 			Print(node, extra);
 		}
 	}
+
+    // Save solution to file
+    void SaveToFile(string source, string answer)
+    {
+        string name = source.substr(0, source.length() - 4) + "_out.txt";
+        ofstream outfile(name.c_str());
+
+        outfile << "BACKWARD CHAINING REASONER\n" << "FILE: " << name << "\n";
+        outfile << mSolution << answer << endl;
+        if (answer == "Answer <= ")
+        {
+            outfile << "QUERY IS A CONSEQUENCE OF THE KB!\n";
+        }
+        else
+        {
+            outfile << "NO SOLUTION FOUND!\n";
+        }
+
+        outfile.close();
+    }
 
 private:
 
@@ -113,6 +133,7 @@ private:
 		}
 
 		PRINT("Answer <= " + print_str)
+        mSolution += "Answer <= " + print_str + "\n";
 
 		string tempnode = extra.back();
 		extra.pop_back();
@@ -124,6 +145,7 @@ private:
 	// Private Vars
 	string mRoot;
 	TreeMap tree;
+    string mSolution;
 
 };
 
@@ -186,7 +208,7 @@ public:
 		{
 			DEBUG("BC:" + temp);
 
-			mAnswer.push_back(temp);
+			mQuery.push_back(temp);
 			temp = fAtoms.Next();
 			
 		} while (temp !=  "");
@@ -219,13 +241,13 @@ public:
 	// resolve and solve given goal and KB
 	string Resolve()
 	{
-		string Answer = "Answer <= ";
-		for (const string &goal : mAnswer)
+        mAnswer = "Answer <= ";
+		for (const string &goal : mQuery)
 		{
-			Answer += Resolve(goal, "ROOT");
+            mAnswer += Resolve(goal, "ROOT");
 		}
 
-		return Answer;
+		return mAnswer;
 	}
 
 	// Print the solution tree
@@ -233,6 +255,12 @@ public:
 	{
 		mSolutionTree.Print("ROOT");
 	}
+
+    // Save solution to file.
+    void SaveToFile(string source)
+    {
+        mSolutionTree.SaveToFile(source, mAnswer);
+    }
 
 
 private:
@@ -266,7 +294,6 @@ private:
 			return node;
 		}
 
-		// string temp;
 		//Iterate through matches using For
 		//For each option in KB
 			
@@ -282,8 +309,9 @@ private:
 		string tempnode;
 		for (const int &i : matches)
 		{
-			tempnode = ""; // reset new path
-			vector<string> &body = Choose(memory);//mKB[i].second;
+            tempnode = ""; // reset new path
+            // Choose nondeterministically a section from KB
+			vector<string> &body = Choose(memory);
 			for (const string &str : body)
 			{
 				tempnode += Resolve(str, node);
@@ -301,10 +329,7 @@ private:
 			mSolutionTree.Empty(node);
 		}
 
-
 		return tempnode;
-
-
 	}
 
 	//Choose : non-determinism on a deterministic machine
@@ -330,7 +355,7 @@ private:
 	string MakeString()
 	{
 		string temp =  "[ ";
-		for (const string &str : mAnswer)
+		for (const string &str : mQuery)
 		{
 			temp = temp + str + " ";
 		}
@@ -339,7 +364,8 @@ private:
 	}
 
 	// private vars
-	vector<string> mAnswer;
+	vector<string> mQuery;
+    string mAnswer;
 	SolutionTree mSolutionTree;
 	KBVec mKB;
 
@@ -393,6 +419,8 @@ int main(int argc, char* argv[])
 		bChainResoner.KB_Push(line);
 	}
 
+    infile.close();
+
 	// Resolve backchain reasoning
 	TRACE("\nSTART RESONER:")
 	string ans = bChainResoner.Resolve();
@@ -408,8 +436,10 @@ int main(int argc, char* argv[])
 	}
 	else
 	{
-		PRINT("QUERY IS A CONSEQUENCE OF THE KB!")
+		PRINT("THE QUERY IS A CONSEQUENCE OF THE KB!")
 	}
+
+    bChainResoner.SaveToFile(file);
 
 
 	return 0;
